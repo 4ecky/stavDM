@@ -12,16 +12,7 @@ import sys
 import time
 from datetime import datetime, timezone, timedelta
 
-# ================= НАСТРОЙКИ =================
-
-TELEGRAM_TOKEN = "8386257020:AAEuP_34BdS47i0D1544Rc_yRAiZg5WYPH0"
-FOOTBALL_DATA_TOKEN = "0EA57DB7F52B410F96600081F28BB0E1"
-
-API_URL = "https://api.football-data.org/v4/matches"
-HEADERS = {"X-Auth-Token": FOOTBALL_DATA_TOKEN}
-
-ADMIN_ID = 662347602
-LOCK_FILE = "bot.lock"
+# ================= variables =================
 
 # ================= СОСТОЯНИЯ =================
 
