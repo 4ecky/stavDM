@@ -13,7 +13,13 @@ import time
 from datetime import datetime, timezone, timedelta
 
 # ================= variables =================
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+FOOTBALL_DATA_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
 
+API_URL = os.getenv("API_URL")
+HEADERS = {"X-Auth-Token": FOOTBALL_DATA_TOKEN}
+
+ADMIN_ID = os.getenv("ADMIN_ID")
 # ================= СОСТОЯНИЯ =================
 
 STARTED_CHATS = set()
@@ -267,20 +273,7 @@ async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================= ЗАПУСК =================
 
-def check_single_instance():
-    if os.path.exists(LOCK_FILE):
-        print("❌ Бот уже запущен.")
-        sys.exit(1)
-    with open(LOCK_FILE, "w") as f:
-        f.write(str(os.getpid()))
-
-def remove_lock():
-    if os.path.exists(LOCK_FILE):
-        os.remove(LOCK_FILE)
-
 def main():
-    check_single_instance()
-
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -290,10 +283,7 @@ def main():
     app.job_queue.run_repeating(main_job, interval=30, first=5)
 
     print("✅ Бот запущен")
-    try:
-        app.run_polling()
-    finally:
-        remove_lock()
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
