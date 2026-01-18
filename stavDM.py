@@ -16,10 +16,10 @@ from datetime import datetime, timezone, timedelta
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 FOOTBALL_DATA_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
 
-API_URL = os.getenv("API_URL")
+API_URL = "https://api.football-data.org/v4/matches"
 HEADERS = {"X-Auth-Token": FOOTBALL_DATA_TOKEN}
 
-ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_ID = 662347602
 # ================= СОСТОЯНИЯ =================
 
 STARTED_CHATS = set()
