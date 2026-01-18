@@ -11,7 +11,7 @@ import os
 import sys
 import time
 from datetime import datetime, timezone, timedelta
-
+from telegram.error import Forbidden
 # ================= variables =================
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 FOOTBALL_DATA_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
@@ -41,9 +41,17 @@ CACHE = {
 # ================= ВСПОМОГАТЕЛЬНОЕ =================
 
 async def send_and_store(bot, chat_id, text, reply_markup=None):
-    msg = await bot.send_message(chat_id, text, reply_markup=reply_markup)
-    BOT_MESSAGES.setdefault(chat_id, []).append(msg.message_id)
-
+    try:
+        msg = await bot.send_message(chat_id, text, reply_markup=reply_markup)
+        BOT_MESSAGES.setdefault(chat_id, []).append(msg.message_id)
+    except Forbidden:
+        # пользователь заблокировал бота — удаляем его
+        STARTED_CHATS.discard(chat_id)
+        LIVE_CHATS.discard(chat_id)
+        DM_CHATS.discard(chat_id)
+        print(f"🚫 Пользователь {chat_id} заблокировал бота")
+    except Exception as e:
+        print("SEND ERROR:", e)
 # ================= API =================
 
 def fetch_live():
@@ -193,6 +201,9 @@ async def main_job(context: ContextTypes.DEFAULT_TYPE):
 
     await process_upcoming(context)
 
+# ----------------глобальный error handler
+async def error_handler(update, context):
+    print("BOT ERROR:", context.error)
 # ================= КОМАНДЫ =================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -279,6 +290,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("stop", stop))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, menu_handler))
+    app.add_error_handler(error_handler)
 
     app.job_queue.run_repeating(main_job, interval=30, first=5)
 
